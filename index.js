@@ -38,10 +38,12 @@ async function run() {
     await client.connect();
     console.log("Connected to MongoDB");
 
-    const db = client.db("Empowering-Recovery-Chain");
+    const db = client.db("Empowering-Recovery-Chain-Final");
     const collection = db.collection("users");
     const suppliesCollection = db.collection("supplies");
+    const donorsCollection = db.collection("donors");
     const reviewsCollection = db.collection("reviews");
+    const gratitudesCollection = db.collection("gratitudes");
 
     // User Registration
     app.post("/api/v1/register", async (req, res) => {
@@ -163,6 +165,34 @@ async function run() {
       });
     });
 
+    //for donors operation
+    app.post("/api/v1/donor-collection", async (req, res) => {
+      const body = req.body;
+      const result = await donorsCollection.insertOne(body);
+      res.status(201).json({
+        success: true,
+        message: "Client donation successful",
+        data: result,
+      });
+    });
+
+    app.get("/api/v1/allDonors", async (req, res) => {
+      const result = donorsCollection.find();
+      if (result.length <= 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Data not found" });
+      }
+      const sortedData = await result.sort({ amount: -1 }).toArray();
+
+      res.status(200).json({
+        success: true,
+        message: "data retrieved successful",
+        data: sortedData,
+      });
+    });
+
+    //clients review collection
     app.get("/api/v1/reviews", async (req, res) => {
       const reviews = await reviewsCollection.find().toArray();
       if (reviews.length === 0) {
@@ -174,6 +204,32 @@ async function run() {
         success: true,
         message: "reviews retrieved successfully",
         data: reviews,
+      });
+    });
+
+    app.post("/api/v1/gratitude", async (req, res) => {
+      const body = req.body;
+      console.log(body);
+      const result = await gratitudesCollection.insertOne(body);
+      res.status(201).json({
+        success: true,
+        message: "gratitude posted successfully",
+        data: result,
+      });
+    });
+
+    app.get("/api/v1/gratitude", async (req, res) => {
+      const result = await gratitudesCollection.find().toArray();
+      if (result.length <= 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "no comments found" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "comments retrieved successful",
+        data: result,
       });
     });
 
