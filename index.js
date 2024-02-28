@@ -40,6 +40,7 @@ async function run() {
 
     const db = client.db("Empowering-Recovery-Chain-Final");
     const collection = db.collection("users");
+    const volunteersCollection = db.collection("volunteers");
     const suppliesCollection = db.collection("supplies");
     const donorsCollection = db.collection("donors");
     const reviewsCollection = db.collection("reviews");
@@ -192,6 +193,19 @@ async function run() {
       });
     });
 
+    // volunteer operations
+    app.post("/api/v1/create-volunteer", async (req, res) => {
+      const body = req.body;
+      const result = await volunteersCollection.insertOne(body);
+      res
+        .status(201)
+        .json({
+          success: true,
+          message: "volunteer sign up successful",
+          data: result,
+        });
+    });
+
     //clients review collection
     app.get("/api/v1/reviews", async (req, res) => {
       const reviews = await reviewsCollection.find().toArray();
@@ -204,6 +218,17 @@ async function run() {
         success: true,
         message: "reviews retrieved successfully",
         data: reviews,
+      });
+    });
+
+    app.post("/api/v1/create-reviews", async (req, res) => {
+      const body = req.body;
+      console.log(body);
+      const result = await reviewsCollection.insertOne(body);
+      res.status(201).json({
+        success: true,
+        message: "Reviews posted successfully",
+        data: result,
       });
     });
 
