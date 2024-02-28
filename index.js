@@ -197,13 +197,28 @@ async function run() {
     app.post("/api/v1/create-volunteer", async (req, res) => {
       const body = req.body;
       const result = await volunteersCollection.insertOne(body);
-      res
-        .status(201)
-        .json({
-          success: true,
-          message: "volunteer sign up successful",
-          data: result,
+      res.status(201).json({
+        success: true,
+        message: "volunteer sign up successful",
+        data: result,
+      });
+    });
+
+    app.get("/api/v1/volunteers", async (req, res) => {
+      const result = await volunteersCollection.find().toArray();
+      if (result.length <= 0) {
+        res.status(404).json({
+          success: false,
+          message: "Volunteers data not found",
+          data: [],
         });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Volunteer retrieved successful",
+        data: result,
+      });
     });
 
     //clients review collection
