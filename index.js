@@ -48,7 +48,7 @@ async function run() {
 
     // User Registration
     app.post("/api/v1/register", async (req, res) => {
-      const { name, email, password } = req.body;
+      const { name, image, email, password } = req.body;
 
       // Check if email already exists
       const existingUser = await collection.findOne({ email });
@@ -63,7 +63,12 @@ async function run() {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert user into the database
-      await collection.insertOne({ name, email, password: hashedPassword });
+      await collection.insertOne({
+        name,
+        email,
+        password: hashedPassword,
+        image,
+      });
 
       res.status(201).json({
         success: true,
@@ -101,6 +106,18 @@ async function run() {
 
     // ==============================================================
     // WRITE YOUR CODE HERE
+
+    app.get("/api/v1/users", async (req, res) => {
+      const result = await collection
+        .find({}, { projection: { password: 0 } })
+        .toArray();
+      res.status(200).json({
+        success: true,
+        message: "users retrieved successful",
+        data: result,
+      });
+    });
+
     app.get("/api/v1/supplies", async (req, res) => {
       const data = await suppliesCollection.find().toArray();
       if (data.length === 0) {
