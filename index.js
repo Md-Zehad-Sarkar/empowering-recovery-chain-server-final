@@ -19,7 +19,10 @@ const port = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://empowering-recovery-chain-client.netlify.app"],
+    origin: [
+      "https://empowering-recovery-chain-client-site.netlify.app",
+      "http://localhost:5173",
+    ],
     credentials: true,
   })
 );
@@ -267,7 +270,6 @@ async function run() {
 
     app.post("/api/v1/gratitude", async (req, res) => {
       const body = req.body;
-      console.log(body);
       const result = await gratitudesCollection.insertOne(body);
       res.status(201).json({
         success: true,
@@ -277,7 +279,12 @@ async function run() {
     });
 
     app.get("/api/v1/gratitude", async (req, res) => {
-      const result = await gratitudesCollection.find().toArray();
+      const result = await gratitudesCollection
+        .find()
+        .sort({
+          createdAt: 1,
+        })
+        .toArray();
       if (result.length <= 0) {
         return res
           .status(404)
