@@ -282,7 +282,8 @@ async function run() {
       const result = await gratitudesCollection
         .find()
         .sort({
-          createdAt: 1,
+          createdAt: -1,
+          createTime: -1,
         })
         .toArray();
       if (result.length <= 0) {
